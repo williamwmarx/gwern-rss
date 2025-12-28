@@ -1,0 +1,11 @@
+name = "gwern-rss"
+main = "src/index.ts"
+compatibility_date = "2025-12-27"
+
+[triggers]
+crons = ["*/15 * * * *"]
+
+[[kv_namespaces]]
+binding = "KV"
+id = "placeholder"
+preview_id = "preview"
