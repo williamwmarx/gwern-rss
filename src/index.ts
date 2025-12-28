@@ -1,5 +1,5 @@
 import type { Env, FeedItem } from "./types";
-import { fetchChangelog } from "./parser";
+import { fetchChangelog, filterToMonth, getMostRecentMonthId } from "./parser";
 import {
   getKnownEntryIds,
   getFeedItems,
@@ -50,10 +50,16 @@ async function updateFeed(env: Env): Promise<void> {
   let allIds: string[];
 
   if (isFirstRun(knownIds)) {
-    // First run: seed ALL entries as "known" but don't add to feed
+    // First run: seed all entries as "known", add most recent month to feed
     allIds = entries.map((e) => e.id);
-    newItems = []; // Don't add to feed on first run
-    console.log(`First run: seeded ${allIds.length} entries`);
+    const currentMonth = getMostRecentMonthId(entries);
+    if (currentMonth) {
+      const recentEntries = filterToMonth(entries, currentMonth);
+      newItems = entriesToFeedItems(recentEntries);
+      console.log(`First run: seeded ${allIds.length} entries, added ${recentEntries.length} from ${currentMonth} to feed`);
+    } else {
+      newItems = [];
+    }
   } else {
     // Normal run: find new entries and add to feed
     const newEntries = findNewEntries(entries, knownIds);

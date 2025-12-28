@@ -84,3 +84,12 @@ function parseMonthYear(monthName: string, year: string): Date {
   const monthNum = months[monthName.toLowerCase()] ?? 0;
   return new Date(parseInt(year), monthNum, 1);
 }
+
+export function getMostRecentMonthId(entries: Entry[]): string | null {
+  if (entries.length === 0) return null;
+  return entries[0].id.split(":")[0];
+}
+
+export function filterToMonth(entries: Entry[], monthId: string): Entry[] {
+  return entries.filter((e) => e.id.startsWith(monthId + ":"));
+}

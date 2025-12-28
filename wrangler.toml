@@ -2,6 +2,7 @@ name = "gwern-rss"
 main = "src/index.ts"
 compatibility_date = "2025-12-27"
 account_id = "3dc1944c1aabdb20168d6c12fc23abd1"
+workers_dev = true
 
 [triggers]
 crons = ["*/15 * * * *"]
