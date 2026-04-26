@@ -16,4 +16,5 @@ export interface FeedItem {
 
 export interface Env {
   KV: KVNamespace;
+  SENTRY_DSN?: string;
 }
