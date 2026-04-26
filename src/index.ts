@@ -14,16 +14,16 @@ import { generateRss } from "./rss";
 export default Sentry.withSentry(
   (env: Env) => ({
     dsn: env.SENTRY_DSN,
-    tracesSampleRate: 1.0,
+    tracesSampleRate: 0,
     sendDefaultPii: false,
   }),
   {
     async scheduled(
       _controller: ScheduledController,
       env: Env,
-      ctx: ExecutionContext
+      _ctx: ExecutionContext
     ): Promise<void> {
-      ctx.waitUntil(updateFeed(env));
+      await updateFeed(env);
     },
 
     async fetch(
