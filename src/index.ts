@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/cloudflare";
 import type { Env, FeedItem } from "./types";
 import { fetchChangelog, filterToMonth, getMostRecentMonthId } from "./parser";
 import {
@@ -10,36 +11,43 @@ import {
 } from "./diff";
 import { generateRss } from "./rss";
 
-export default {
-  async scheduled(
-    _event: ScheduledEvent,
-    env: Env,
-    ctx: ExecutionContext
-  ): Promise<void> {
-    ctx.waitUntil(updateFeed(env));
-  },
+export default Sentry.withSentry(
+  (env: Env) => ({
+    dsn: env.SENTRY_DSN,
+    tracesSampleRate: 1.0,
+    sendDefaultPii: false,
+  }),
+  {
+    async scheduled(
+      _controller: ScheduledController,
+      env: Env,
+      ctx: ExecutionContext
+    ): Promise<void> {
+      ctx.waitUntil(updateFeed(env));
+    },
 
-  async fetch(
-    request: Request,
-    env: Env,
-    _ctx: ExecutionContext
-  ): Promise<Response> {
-    const url = new URL(request.url);
+    async fetch(
+      request: Request,
+      env: Env,
+      _ctx: ExecutionContext
+    ): Promise<Response> {
+      const url = new URL(request.url);
 
-    if (url.pathname === "/" || url.pathname === "/feed.xml") {
-      const feedItems = await getFeedItems(env.KV);
-      const rss = generateRss(feedItems);
-      return new Response(rss, {
-        headers: {
-          "Content-Type": "application/rss+xml; charset=utf-8",
-          "Cache-Control": "public, max-age=300",
-        },
-      });
-    }
+      if (url.pathname === "/" || url.pathname === "/feed.xml") {
+        const feedItems = await getFeedItems(env.KV);
+        const rss = generateRss(feedItems);
+        return new Response(rss, {
+          headers: {
+            "Content-Type": "application/rss+xml; charset=utf-8",
+            "Cache-Control": "public, max-age=300",
+          },
+        });
+      }
 
-    return new Response("Not found", { status: 404 });
-  },
-};
+      return new Response("Not found", { status: 404 });
+    },
+  } satisfies ExportedHandler<Env>
+);
 
 async function updateFeed(env: Env): Promise<void> {
   const entries = await fetchChangelog();
