@@ -8,12 +8,12 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20260506.1",
+    "@cloudflare/workers-types": "^4.20260507.1",
     "typescript": "^6.0.3",
     "wrangler": "^4.88.0"
   },
   "dependencies": {
-    "@sentry/cloudflare": "^10.51.0",
+    "@sentry/cloudflare": "^10.52.0",
     "linkedom": "^0.18.12"
   }
 }
